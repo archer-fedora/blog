@@ -1,13 +1,11 @@
-## Welcome to LB Pages
+---
+layout: default
+title: 我的Blog
+---
+{{ page.title }}
 
-### FirstPush
+最新文章
 
-first blog on 2018.05.18
-
-```markdown
-#include <iostream>
-int main()
-{
-	std::cout<<"hello world!"<<std::endl;
-}
-```
+{% for post in site.posts %}
+{{ post.date | date_to_string }} {{ post.title }}
+{% endfor %}

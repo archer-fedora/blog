@@ -1,10 +1,12 @@
 ---
-layout: default
-title: 我的Blog
+layout:common
+title: Archer's Blog
 ---
 
-最新文章
+Newest Blog
 
+<ul class="posts">
 {% for post in site.posts %}
-{{ post.date | date_to_string }} {{ post.title }}
+  <li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }}</a></li>
 {% endfor %}
+</ul>

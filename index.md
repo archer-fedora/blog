@@ -1,5 +1,4 @@
 ---
-layout: common
 title: Archer's Blog
 ---
 

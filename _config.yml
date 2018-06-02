@@ -1,22 +1,22 @@
 # Site settings
 
-author: Yourname
-email: example@email.com
-twitter_username: twitter
-github_username:  github
-googleplus_username: google
+author: Bobliu
+email: -@email.com
+twitter_username: archer
+github_username:  archer
+googleplus_username: archer
 
-head-title: Your blog
-title: Your blog
+head-title: Bobliu's blog
+title: 路漫求索正当时，半城绿树半城花
 
-baseurl: /blog/    # the subpath of your site, "/blog"
+baseurl: /blog    # the subpath of your site, "/blog"
 url: ""
 
 # footer 
-description: "I know that what I'm doing looks stupid, but I'm a big boy and really want to do this."
+description: "Do what you want, Study what you need, \nLove the person who you love. Only Keep On"
 
-favo: "春梦随云散，飞花逐水流"
-descrpt: "“巧者劳而智者忧，无能者无所求，饱食而遨游，泛若不系之舟”  ——《南华经》"
+favo: "路漫漫其修远兮 吾将上下而求索"
+descrpt: "“巧者劳而智者忧，无能者无所求，饱食而遨游，泛若不系之舟”  ——《南华经》\n "
 
 
 #
@@ -39,7 +39,7 @@ sass:
 
 permalink: /posts/:categories/:title.html
 
-paginate: 7
+paginate: 5
 #paginate_path: 'page/:num'
 
 gems: [jekyll-paginate, jekyll-last-modified-at, jemoji]

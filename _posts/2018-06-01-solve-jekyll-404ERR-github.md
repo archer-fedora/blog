@@ -6,6 +6,8 @@ tags: ruby, github, jekyll,404
 description: fix the jekyll problem on github
 ---
 
+ fix the jekyll problem on github
+
 # Everything begin here
 
 Today I try to push my blog to GitHub, but I find the files under "_post" folder can't be found, Github return 404 error. So I want to know why

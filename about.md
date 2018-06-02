@@ -4,13 +4,10 @@ title: About
 permalink: /about/
 ---
 
-#### Tagline
-
-Your tagline.
 
 #### Introduction
 
-Introduce yourself.
+this man is so lazy....
 
 #### This theme
 

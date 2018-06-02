@@ -1,16 +1,14 @@
 ---
 layout: post
-title: install ruby on Centos6.5
+title: Install ruby on Centos6.5
 category: tools
 tags: ruby, github, jekyll
-description: install ruby on Centos6.5
+description: Install ruby on Centos6.5
 ---
+this page record the process of installing ruby on Centos6.5, 
+with all cmd will use
 
-
-{{page.date|date_to_string}}
-
-
-## install ruby on Centos6.5
+# install ruby on Centos6.5
 
 ### install ruby of new version
 

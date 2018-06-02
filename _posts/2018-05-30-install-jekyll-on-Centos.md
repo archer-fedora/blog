@@ -1,5 +1,5 @@
 ---
-layout: common
+layout: post
 title: install ruby on Centos6.5
 category: tools
 tags: ruby, github, jekyll

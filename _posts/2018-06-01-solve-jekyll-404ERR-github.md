@@ -1,6 +1,9 @@
 ---
 layout: common
 title: Solve the 404 ERROR on github
+category: github, jekyll
+tags: ruby, github, jekyll,404
+description: fix the jekyll problem on github
 ---
 
 # Everything begin here

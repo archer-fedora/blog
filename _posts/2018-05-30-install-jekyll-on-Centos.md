@@ -1,6 +1,9 @@
 ---
 layout: common
 title: install ruby on Centos6.5
+category: tools
+tags: ruby, github, jekyll
+description: install ruby on Centos6.5
 ---
 
 

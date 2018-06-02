@@ -2,11 +2,11 @@
 # 1. Empty strings are truthy.
 
 - id: tab-test
-  name: test
+  name: Thanks for Wait
   fp: tab/test.html
-  disabled: false
+  disabled: true
 
 - id: tab-test1
-  name: diasble-test
+  name:  Thanks for Wait
   fp: tab/test1.html
   disabled: true

@@ -46,4 +46,22 @@ layout: default
     {% include mathjax_support.html %}
   {% endif %}
 
+
 </div>
+
+
+<div id="gitmentContainer"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+    owner: 'archer_fedora@163.com',
+    repo: 'git@github.com:archer-fedora/blog.git',
+    oauth: {
+        client_id: '39c47cdc78f4fdbdf4cf',
+        client_secret: '7ed649f627ba5fe8a67321ea38dc3ce7beaef58d',
+    },
+});
+gitment.render('gitmentContainer');
+</script>
+

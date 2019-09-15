@@ -27,6 +27,7 @@ description: leetcode
 
 
 
+```c++
 int isValid(char c) 
 {
     if (c >= 'a' && c<='z') return 1;
@@ -35,8 +36,7 @@ int isValid(char c)
     return 0;
 }
 
-bool isPalindrome(char * s){
-
+bool isPalindrome(char * s){ 
     if (s == NULL) return false;
     int len = strlen(s);
     if (len <= 1) return true;
@@ -59,6 +59,8 @@ bool isPalindrome(char * s){
     }
     return true;
 }
+```
+
 
 
 

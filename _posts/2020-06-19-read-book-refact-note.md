@@ -1,282 +1,32 @@
----
 layout: post
 title:  Read Book
 category: book
 tags: refact
 description: read book
 
----
+# 				重构代码读书笔记
 
-## 
+# 一. 概述
 
-# 重构代码读书笔记
 
-## 坏味道
-
-**令人迷惑的临时变量**
-
-将一个表达式提取为一个单独的函数，新函数可以被其它函数调用。之中有一段实例代码，用python改写如下：
-
-```
-def calc_price(self):
-	base_price = self._quality * self._item_price
-	if base_price > 1000:
-		return base_price * 0.95
-	else:
-		return base_price * 0.98
-```
-
-重构后是这样的
-
-```
-def calc_price(self):
-	if self.base_price() > 1000:
-		return self.base_price() * 0.95
-	else:
-		return self.base_price() * 0.98
-
-def base_price(self):
-	return self._quality * self._item_price
-```
-
-## 基本类型偏执 ##
-
-```text
-/**
-* a 存款
-* b 收入
-**/
-public getSum(int a，int b){
-    return a+b;
-}
-```
-
-```text
-public class Money{
-
-    public int value;//货币面值
-    public String name;//货币名称
-    public float rate; //汇率
-}
-
-public getSum(Money a,Money b){
-  return a.value*a.rate+b.value*b.rate;
-}
-```
-
-
-
-
-
-## 惊现switch ##
-
-```
-public static int getServiceCode(String str){
-     int code = 0;
-     if(str.equals("Age")){
-         code = 1;
-     }else if(str.equals("Address")){
-         code = 2;
-     }else  if(str.equals("Name")){
-         code = 3;
-     }else if(str.equals("No")){
-         code = 4;
-     }
-     return  code;
- }
-```
-
-　　重构后的代码如下所示：
-
-```
-public static void initialMap(){
-     map.put("Age",1);
-     map.put("Address",2);
-     map.put("Name",3);
-     map.put("No",4);
- }
-```
-
-
-
-#### 以多态取代条件表达式(Replace Conditional with Polymorphism)
-
-**问题**
-
-你手上有个条件表达式，它根据对象类型的不同而选择不同的行为。
-
-```
-class Bird {
-  //...
-  double getSpeed() {
-    switch (type) {
-      case EUROPEAN:
-        return getBaseSpeed();
-      case AFRICAN:
-        return getBaseSpeed() - getLoadFactor() * numberOfCoconuts;
-      case NORWEGIAN_BLUE:
-        return (isNailed) ? 0 : getBaseSpeed(voltage);
-    }
-    throw new RuntimeException("Should be unreachable");
-  }
-}
-```
-
-**解决**
-
-将这个条件表达式的每个分支放进一个子类内的覆写函数中，然后将原始函数声明为抽象函数。
-
-```
-abstract class Bird {
-  //...
-  abstract double getSpeed();
-}
-
-class European extends Bird {
-  double getSpeed() {
-    return getBaseSpeed();
-  }
-}
-class African extends Bird {
-  double getSpeed() {
-    return getBaseSpeed() - getLoadFactor() * numberOfCoconuts;
-  }
-}
-class NorwegianBlue extends Bird {
-  double getSpeed() {
-    return (isNailed) ? 0 : getBaseSpeed(voltage);
-  }
-}
-
-// Somewhere in client code
-speed = bird.getSpeed();
-```
-
-
-
-【1】原代码
-
-![复制代码](https://common.cnblogs.com/images/copycode.gif)
-
-```
- 1 class Sanitation 
- 2 {
- 3 public:
- 4     string washHands() 
- 5     {
- 6         return "Cleaned ...";
- 7     }
- 8 };
- 9 
-10 class Child : public Sanitation 
-11 {
-12 
-13 };
-```
-
-![复制代码](https://common.cnblogs.com/images/copycode.gif)
-
-【2】以委托取代继承
-
-![复制代码](https://common.cnblogs.com/images/copycode.gif)
-
-```
-class Child
-{
-public:
-    Child() 
-    {
-        m_pSanitation = new Sanitation();
-    }
-
-    string washHands() 
-    {
-        // 这里使用委托获得 washHands() 方法 
-        return (m_pSanitation->washHands());
-    }
-    
-private:
-    Sanitation *m_pSanitation; // 具有委托对象 Sanitation 的实例
-};
-```
-
-![复制代码](https://common.cnblogs.com/images/copycode.gif)
-
-
-
-
-
-### 代码坏味道之代码臃肿
-
-> **[代码臃肿(Bloated)](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之代码臃肿.md)这组坏味道意味着：代码中的类、函数、字段没有经过合理的组织，只是简单的堆砌起来。这一类型的问题通常在代码的初期并不明显，但是随着代码规模的增长而逐渐积累（特别是当没有人努力去根除它们时）。**
-
-- [过长函数](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之代码臃肿.md#过长函数)
-- [过大的类](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之代码臃肿.md#过大的类)
-- [基本类型偏执](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之代码臃肿.md#基本类型偏执)
-- [过长参数列](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之代码臃肿.md#过长参数列)
-- [数据泥团](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之代码臃肿.md#数据泥团)
-
-### 代码坏味道之滥用面向对象
-
-> **[滥用面向对象(Object-Orientation Abusers)](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之滥用面向对象.md)这组坏味道意味着：代码部分或完全地违背了面向对象编程原则。**
-
-- [switch 声明](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之滥用面向对象.md#switch-声明)
-- [临时字段](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之滥用面向对象.md#临时字段)
-- [被拒绝的馈赠](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之滥用面向对象.md#被拒绝的馈赠)
-- [异曲同工的类](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之滥用面向对象.md#异曲同工的类)
-
-### 代码坏味道之变革的障碍
-
-> **[变革的障碍(Change Preventers)](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之变革的障碍.md)这组坏味道意味着：当你需要改变一处代码时，却发现不得不改变其他的地方。这使得程序开发变得复杂、代价高昂。**
-
-- [发散式变化](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之变革的障碍.md#发散式变化)
-- [霰弹式修改](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之变革的障碍.md#霰弹式修改)
-- [平行继承体系](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之变革的障碍.md#平行继承体系)
-
-### 代码坏味道之非必要的
-
-> **[非必要的(Dispensables)](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之非必要的.md)这组坏味道意味着：这样的代码可有可无，它的存在反而影响整体代码的整洁和可读性。**
-
-- [过多的注释](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之非必要的.md#过多的注释)
-- [重复代码](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之非必要的.md#重复代码)
-- [冗余类](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之非必要的.md#冗余类)
-- [纯稚的数据类](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之非必要的.md#纯稚的数据类)
-- [夸夸其谈未来性](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之非必要的.md#夸夸其谈未来性)
-
-### 代码坏味道之耦合
-
-> **[耦合(Couplers)](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之耦合.md)这组坏味道意味着：不同类之间过度耦合。**
-
-- [依恋情结](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之耦合.md#依恋情结)
-- [狎昵关系](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之耦合.md#狎昵关系)
-- [过度耦合的消息链](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之耦合.md#过度耦合的消息链)
-- [中间人](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之耦合.md#中间人)
-- [不完美的库类](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之耦合.md#不完美的库类)
-
-## 扩展阅读
-
-- [代码的坏味道和重构](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/)
-- [代码坏味道之代码臃肿](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之代码臃肿.md)
-- [代码坏味道之滥用面向对象](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之滥用面向对象.md)
-- [代码坏味道之变革的障碍](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之变革的障碍.md)
-- [代码坏味道之非必要的](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之非必要的.md)
-- [代码坏味道之耦合](https://github.com/dunwu/blog/blob/master/source/_posts/design/refactor/代码坏味道之耦合.md)
-
-![图片](https://img-blog.csdnimg.cn/2020051816393535.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2JhaXllamlhbnhpbg==,size_16,color_FFFFFF,t_70#pic_center)
 
 接触这些坏代码可以分为三类：
 
-1. 见名知意的代码坏味道：
-2. 稍微解释即可掌握的代码坏味道；
-3. 通过一些例子即可掌握的代码的坏味道；
+1. 代码坏味道导致代码臃肿：
+2. 代码坏味道导致修改演进困难；
+3. 代码的坏味道之c++；
 
-本文主要聚焦在“见名知意的代码坏味道”，后续两类坏味道将在后续的文章中解释说明：
+重点总结c语言相关的坏味道
 
-## 1. 重复代码
+# 二. 坏味道识别
+
+## 1. 代码坏味道导致代码臃肿：
+
+### 01 重复代码
 
 简单的复制/粘贴，或者无意间添加了相同逻辑的代码都是有可能的导致重复代码出现的。
 
-
+`见gui.py`
 
 **那么为什么重复的代码是一种坏味道？**
 
@@ -295,19 +45,15 @@ private:
 5. 如果重复的代码在不同的类中，且这些类之间关联性不大，那么可以 Extract Class，将重复的挪动到一个新的类中，原本出现重复的地方来调用这个新产生的类的方法。
 6. 消除重复之后，检测代码表达的意图是否准确、完成，Extract Method 时可以通过良好的方法名来解释提炼的函数的作用和意图。
 
-## 2 长函数
+### 02 长函数
 
 顾名思义，长度过长的函数。其中包括两种情况，横向过长，纵向过长。
-
-
 
 **为什么长函数是一种坏味道？**
 
 横向过长时，往往一眼无法快速了解该行代码要表达的意思和中间的过程。当出现 Bug 定位问题时也不容易一次性定位到问题所在。
 
 纵向过长时，往往会感觉某个函数内部逻辑复杂、晦涩难懂。修改代码中也会因为无法照顾到要修改的方法中的其他行代码，而顾此失彼，最终导致难度难修改。经过多次修改后甚至原有的基本结构都会遭到破坏，导致后续修改难度逐渐增加。
-
-
 
 **如何解决长函数的问题？**
 
@@ -335,139 +81,11 @@ List<Node> nodes = items
 1. 纵向过长的代码。往往多个实现细节堆叠在一个方法中造成的，这种情况下使用 Inline Temp（内联局部变量）、 Extract Method 的重构手法来提炼小的函数。一个类中有很多零散的小函数也是常见的，因此提炼函数的同时记住，提炼函数的也是也是考虑创建新的类时候，将不同作用的函数提炼到响应职责的类中。
 2. 纵向过长的代码，往往存在职责不够单一的情况，保持方法职责的单一有助于维护代码的可读性。通过 2 中 提到的 Extract Method，那么某个具体实现细节可以被提炼到一个小函数中，而原来的函数则职责就编程调度作用。所以方法的单一职责，更清晰的描述应该是一类事情，要么只在处理实现细节，要么处理调度协调代码调用。
 
-```java
-public class OrderService{
-
-  ...
-
-  public Order create(OrderDTO orderDTO) {
-    // 创建条件是否符合 4 行
-    ...
-
-    // 货币转换 4 行
-    ...
-
-    // 折扣计算 5 行
-    ...
-
-    // 将 OrderDTO 转换为 Order 对3行
-    ...
-
-    // 存储 Order 1 行
-    ... 
-
-    // 通知下有业务 5 行
-    ...
-
-    return order;
-  }
-}
-```
-
-看遗留系统时和面试作业的时候，总是看到这类代码，可以通过提炼函数并遵守方法的单一职责原则，就能够简单的重构实现一个逻辑更为清晰的代码结构，如下：
-
-```java
-public class OrderService {
-
-    ...
-
-    public Order create(OrderDTO orderDTO) {
-         verify(orderDTO);
-
-         Order order = orderRepository.save(orderMapper.toOrder()); 
-
-         notifyService.notify(order);
-
-         return order;
-    }
-
-
-    private void verify(OrderDTO orderDTO) {
-         // 创建条件是否符合 4 行
-         ...
-    }
-}
-
-
-public interface OrderMapper {
-  ...
-  public Order toOrder() {
-    // 将 OrderDTO 转换为 Order 对3行
-    Currency currency = CurrentyTranslator.translator(currency); // 货币转换
-    BigDecimal price = currentyTranslator.calculate(products);   // 提炼函数
-    ...
-  }
-}
-
-
-public class CurrentyTranslator {
-        public static Currency translate (Currency currency) {
-        // 货币转换 4 行
-            ...
-    }
-}
-
-public class PriceService {
-
-    public BigDecimal calculate(List<Product> products) {
-            // 折扣计算 5 行
-            ...
-        return xxx;
-    }
-
-}
-
-public class NotifyService {
-    private void notify(Order order){
-          // 通知下有业务 5 行
-          ...
-    }
-}
-```
-
-上面只是一个简单的重构方法，其中涉及到的重构手法：
-
- Move Field（搬移函数）将上下文相关的变量挪动的一起；
-
- Extract Method (提炼函数) 将某个具体的实现提炼到一个职责单一的方法中。
-
- Extract Method （提炼类）一个类尤其单独的职责，因此将那些和原本的该类的职责关联性不大的逻辑方法提炼到特定的类中。
-
- Inline Field（内联临时变量）如果一个变量对语意理解并没有什么帮助，那么就可以采用内联临时变量的方法，消除显示的定义变量，从而减少代码的行数，同时阅读代码时也会更加清爽、聚焦。
-
-更具实际业务场景还可以借助一些注解、工具类、AOP 来让验证、转换、通知部分变得更加简洁。通过提炼函数的重构手法，能够让后续的重构更加方便可靠。
-
-如果翻阅一些开发规范会发现有的团队规定一个方法不超过 15 行，其实知道这个规范只能获取到一个参考量，注意到行数多对，更重要的时候发现问题后的小步重构。
-
-## 3 过大的类
-
-顾名思义就是一个类做了太多的事情。SOLID 原则告诉我们类的职责应该是单一的，而一个过大类很可能意味着承担了多个/多类职责。
 
 
 
-**过大的类为什么是一种坏味道？**
 
-由于过大的类承担了过多的职责，很容易导致 重复代码 且 重复代码 不容易被发现，而这往往是坏味道的开始。
-
-如果过大的类对外提供服务发生了变动，并不容易快速响应这样的变化，可以对比一下一个小而职责单一的类中进行修改方便还是在多很多职责。
-
-当过大的类因为某个地方发生变化，很可能导致不相关的调用方的代码也会发生变化，这是一种耦合性的表现。
-
-当过大的类被继承时很可能导致其他的坏味道，例如遗留的馈赠。
-
-因此，保持小而职责单一的类将会对系统的设计有很大的帮助。当然也可以参考 Simple Design，避免过度设计的前提下保持简单的设计。
-
-
-
-**如何解决过大的类的代码坏味道？**
-
-1. 观察这个过大的类的属性，看是否有关联的几个属性能够代表一定的业务意思，如果可以使用 Extract Class，将这几个属性挪动到一个新的类中，并将相关操作挪动到新的类中。循环往复，这样一个大的类能够拆分成多个小的且职责较为单一的类。
-2. 观察这个大类中的方法，看是否存在兄弟关系的方法，如果有可以使用 Extract Subclass （提炼子类）的方法，将相关方法提炼到子类中，并考虑使用继承父类还是面向接口使用 Extract Interface（提炼接口）。这样相似行为的行为聚集在一个类中，拆分到多个类中，并可以进一步和方法的调用发来解耦。
-3. 进一步观察剩余类的行为，如果这些行为在处理一类事情，那么可以停止了，在处理多类事情，可以按照处理逻辑的类型进一步拆分。
-
-简而言之，使用一个亘古不变的法则：分治法。将过大的类，拆分成多个职责单一的小类，手段是 Extract Class，Extract Subclass，Extract Interface。
-
-## 4 过长参数列表
+### 04 过长参数列表
 
 当方法的参数列表过长时这也是一种代码的坏味道。
 
@@ -489,7 +107,7 @@ public class NotifyService {
 
 需要的注意的是，有些情况下长参数的存在也是合理的，因为在一定程度上可以避免某些依赖关系的产生。可以通过观察长参数函数变化的频率，并采用“事不过三，三则重构“的原则，保持进行重构的准备。
 
-## 5 Switch 语句
+### 05 Switch 语句
 
 Switch 语句代表一类语句，比如 if...else, switch... case 语句都是 switch 语句。
 
@@ -498,18 +116,27 @@ Switch 语句代表一类语句，比如 if...else, switch... case 语句都是 
 首先并不是所有的 Switch 语句都是坏味道，Swith 语句开发中常见的语句。这里带有坏味道的 Switch 语句指的是那些造成重复代码的 Switch语句。例如：根据某个状态来判断执行执行哪个动作。
 
 ```text
-public Order nextStep(...) {
-        if (state == 1) {
-                // do something
-        } else if (state == 2) {
-                // do something
-        } else if (state == 3) {
-                // do something
-        } else {
-                // do something
-        }
-}
+public static int getServiceCode(String str){
+     int code = 0;
+     if(str.equals("Age")){
+         code = 1;
+     }else if(str.equals("Address")){
+         code = 2;
+     }else  if(str.equals("Name")){
+         code = 3;
+     }else if(str.equals("No")){
+         code = 4;
+     }
+     return  code;
+ }
 ```
+
+`public static void initialMap(){
+   map.put("Age",1);`
+     `map.put("Address",2);`
+     `map.put("Name",3);`
+     `map.put("No",4);`
+ }
 
 这种实现方法很多代码中都会出现，但是多数人使用这种方式添加代码，并不意味着这是一种好的代码。这样的实现方式很容易造成长函数，而且每次修改的位置要非常精准，需要在多个条件中逐个遍历找到最终需要的那个，再修改，可读性上无疑也是很差的。
 
@@ -523,7 +150,7 @@ public Order nextStep(...) {
 
 总而言之，一旦打算通过叠加新的 swtich case 来添加新逻辑，那么就应该关注一下代码设计，因为这种操作很有可能就是为后续的代码在挖坑。同时理解清楚那些swtich 语句是具有坏味道的语句。
 
-## 6 夸夸其谈的未来性
+### 06 夸夸其谈的未来性
 
 这是工作中最常见的一类问题，比如如果你听到这句话“我将文件上传的实现做了调整 ... 未来再使用的时候将会 ...”就应该警觉起来。
 
@@ -548,7 +175,7 @@ Simple Design （简单设计原则）能够帮助我们作出抉择。当实现
 
 工作中有两类未来性。一类是假设调用方可以怎么使用；一类是未来必然发生的业务功能。代码的坏味道更多的指的是第一种情况，第二种情况可以开发之前体现进行简单设计和拆分，从而避免过度设计，同时可以避免谈未来性，来让代码随着功能一起小步重构并演进。
 
-## 7 令人迷惑的临时字段
+### 07 令人迷惑的临时字段
 
 在一些场景下为了在实现上的临时方便性，有的开发者会直接在某个对象上添加一个属性，后续使用在需要的时候使用该属性。
 
@@ -561,7 +188,36 @@ Simple Design （简单设计原则）能够帮助我们作出抉择。当实现
 1. 问题的原因是随意向类上添加字段，解决的方法就是将这个临时字段移走，可以为这个字段找到一个合适的类来存放，也可以使用 Extract Class （提炼类）将这个字段添加到一个新类中，然后将该字段的相关的逻辑移动到该类中，并确定该类的职责。
 2. 可以将临时字段作为参数进行传递，但是为了避免过长参数的出现，可以选择将临时字段提炼到一个新的类中。
 
-## 8 过多的注释
+举例：
+
+将一个表达式提取为一个单独的函数，新函数可以被其它函数调用。之中有一段实例代码，用python改写如下：
+
+```
+def calc_price(self):
+	base_price = self._quality * self._item_price
+	if base_price > 1000:
+		return base_price * 0.95
+	else:
+		return base_price * 0.98
+```
+
+重构后是这样的
+
+```
+def calc_price(self):
+	if self.base_price() > 1000:
+		return self.base_price() * 0.95
+	else:
+		return self.base_price() * 0.98
+
+def base_price(self):
+	return self._quality * self._item_price
+	
+```
+
+
+
+### 08 过多的注释
 
 这是注释降低代码可读性，甚至误导了代码要要表达的意图。
 
@@ -587,27 +243,11 @@ Simple Design （简单设计原则）能够帮助我们作出抉择。当实现
 10. 注释掉的代码
     ...
 
-作者：PageThinker
-链接：https://zhuanlan.zhihu.com/p/141803738
-来源：知乎
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+## 2. 代码坏味道导致修改演进困难
 
 
 
-如上图，这 10 个代码坏味道是：
-
-1. 发散式变化
-2. 霰弹式修改
-3. 依恋情结
-4. 数据泥球
-5. 基本类型偏执
-6. 平行继承体系
-7. 冗赘类
-8. 过度耦合信息链
-9. 异曲同工的类
-10. 纯数据类
-
-## 01 发散式变化
+### 01 发散式变化
 
 简而言之就是一个类总是因为不同类型的原因发生变化。例如：需要修改数据源时要修改该类，需要修改缓存时还需要修改这个类，甚至当修改某个策略的计算公式时还会牵连到这个类。这种总是/经常因为不同类型原因导致一个类发生变化的代码就是指的发散式变化。
 
@@ -627,7 +267,7 @@ Simple Design （简单设计原则）能够帮助我们作出抉择。当实现
 
 发散式变化虽然很简单，但是却是很容易遇到的一种坏味道。因为刚开始添加的代码的很可能体会不到一个存在多类行为的坏处。只有当类发生变化或者修改的时候才会逐渐这种大而全的实现的缺点。
 
-## 02 霰弹式修改
+### 02 霰弹式修改
 
 当一个类进行了修改会导致很多其他类也需要相应进行修改，我们称为“霰弹式修改”。
 
@@ -644,33 +284,9 @@ Simple Design （简单设计原则）能够帮助我们作出抉择。当实现
 
 也可以创建代理类或者方法重载来来解决特定的霰弹式修改导致的问题。
 
-### 03 平行继承体系（Parallel Inheritance Hierarchies）
-
-平行继承体系指：当一个类增加 1 个子类的时候，另外一个类也需要增加被迫增加一个子类。
-
-例如：
-
-<img src="https://pic3.zhimg.com/v2-265467078f3e06634004c2111620180e_b.jpg" data-caption="" data-size="normal" data-rawwidth="1719" data-rawheight="919" class="origin_image zh-lightbox-thumb" width="1719" data-original="https://pic3.zhimg.com/v2-265467078f3e06634004c2111620180e_r.jpg"/>
 
 
-
-当添加 XXXVIPTaskService 的时候就会需要新增出新的 XXXVIPScoreService 。
-
-**为什么平行继承体系是一种代码坏味道？**
-
-1. 显而易见虽然没有直接关联，但是两者是同时产生并存的，但是两者的关联性并不显性的呈现，而是在 GradeService 中才体现出来。
-2. 这样的实现容易导致在 GradeService 中 Switch 语句的产生，switch 语句本身就是一种重复的体现。关于Switch 语句的问题可以参考：[识别代码中的坏味道（一）](https://zhuanlan.zhihu.com/p/141435233)
-
-**如何解决平行继承体系这种代码坏味道？**
-
-围绕上面说的原因可以做出如下两步重构：
-
-1. 建立直接引用。即 SVIPTaskService 直接引用 SVIPScoreService。
-2. 参考[《Java有限状态机的4种实现对比》](https://zhuanlan.zhihu.com/p/97442825)消除继承体系，这里过程可以使用Move Field 和 Move Method 等重构手法。
-
-通过上面的重构，隐形的关联变成直接引用。另外避免了 Switch 语句的问题。
-
-## 04 依恋情结
+### 03 依恋情结
 
 刚开始接触代码中的坏味道时，乍一看你可能会觉得有些费解。其实它描述的问题却是很简单的，就是：一个类多次调用另外一个类的方法来获取最终的结果。如下
 
@@ -720,7 +336,7 @@ public class CartService {
 
 通过上面简单两步，我们可以将后续变化影响的范围变小，OrderService 内的变化将不再容易牵连到 CartService。
 
-## 05 数据泥球
+### 04 数据泥球
 
 数据泥球指的是：多个类/方法参数中都有相同的属性，且这些相同的属性的业务意义也是相同的。
 
@@ -738,7 +354,7 @@ public class CartService {
 2. 如果是多个方法参数中出现了多个重复的多个参数，可以通过 Introduce Parameter Object（引入参数对象）将多个参数使用对象来代替，从而有效的减少重复和参数个数。
 3. 其中 2 的另外一种情况，如何调用者先通过一些逻辑生成几个变量，再将这几个变量通过参数传递给调用的方法，那么可以使用 Presere Whole Object（保持对象完整），将变量生成提炼到一个函数中，并并取消参数的传递，而是在被调用的方法中直接调用原本要传递的参数。
 
-## 06 基本类型偏执
+### 05 基本类型偏执
 
 描述的是这样一种代码实现方式：经常使用基本数据类型，而不愿意使用对象将这些基本数据类型和其行为进行封装。
 
@@ -758,29 +374,38 @@ public class CartService {
 
 因此，并不是不能使用基本数据类型，而是应该在揭示某个业务意图的时候适当的使用封装，将多个基本数据类型封装到一个类中。从而通过对象直白的表达意图。
 
-**如何解决基本类型偏执这种代码坏味道？**
 
-1. 通过 Extract Method （提炼函数）将几个基本数据类型拼接的逻辑提炼为一个方法，比通过方法名来解释意图。
-2. 如果按照1做了，发现类中出现不应该出现的职责，那么就可以将几个相关的基本数据类型通过 Extract Class（提炼类）将几个基本数据类型提炼为一个类来表达一个概念，然后通过 Move Method 来讲相关的操作挪动到该类中。
-3. 如果使用基本数据类型来表示状态，可以选择使用 Replace Type Code with Class（以类取代类型码），并将相关的操作移动到类中，避免 Switch 语句。场景可以参考[《Java有限状态机的4种实现对比》](https://zhuanlan.zhihu.com/p/97442825)
 
-## 07 冗赘类（Lacy Class）
+```text
+/**
+* a 存款
+* b 收入
+**/
+public getSum(int a，int b){
+    return a+b;
+}
+```
 
-这是单一职责的一个极端表现，即拆分了很多类，每个类的职责过度单一。
+```text
+public class Money{
 
-**为什么冗赘类是一种代码坏味道？**
+    public int value;//货币面值
+    public String name;//货币名称
+    public float rate; //汇率
+}
 
-因为每个类都是有阅读成本低的，职责拆分的过细，意味着多个关联性强的职责也被拆分了，因此阅读代码来成本不一定提升，反而因为过分的分散而导致理解起来需要会非常费劲。
+public getSum(Money a,Money b){
+  return a.value*a.rate+b.value*b.rate;
+}
+```
 
-**如何解决冗赘类这种代码坏味道？**
 
-这个坏味道也给开发者一个提醒，极端的追求某些原则同样会导致不必要的麻烦，因此需要通过不断的练习和思考来获取平衡的这种点。
 
-代码中一旦遇到职责过度拆分的情况就可以通过 Inline Class 或者 Collapse Hierarchy 来删除一些类，将概念合并到一个类中。
 
-当代码更多的是处理业务逻辑的时候，那么其中的类应该像领域语言靠近，尽量避免凭空制造一些概念，拆分职责的时候和业务相结合更有利于我们将代码写的简单易读。
 
-## 08 过度耦合的消息链
+
+
+### 06 过度耦合的消息链
 
 这种代码味道值得是不断从获取到的对象的子对象，导致很长的调用链。
 
@@ -834,61 +459,15 @@ String postCode = user.getAddress()
 
 因此可以有限照顾可读性，通过 Extract Method 和 Move Method 来进行重构，从而获取实现和维护性上的平衡。
 
-## 09 异曲同工的类
-
-即两个类做的同一件事或者同一类事。这种代码很常见，比如两个开发者同时执行自己的开发工作，创建了功能类似但是方法不同的类，Code Review 的时候很容易发现这种代码。
-
-**为什么异曲同工的类是一种代码坏味道？**
-
-按照上面的描述，如果保留两个职责类似的类会有什么不好？
-
-1. 后续调用实现类时会导致选择上的疑虑，两个类应该选择用哪个，而疑虑之下就是时间的浪费。
-2. 添加代码的时候，只向其中一个类中添加了逻辑，后续调用时 就会困扰调用者，而且容易导致两个类中容易出现重复的代码。
-
-异曲同工的类是后续很多坏味道的开始。
-
-**如何解决异曲同工的类这种代码坏味道？**
-
-1. 一般情况，如果两个类是一般的工具类，可以选择使用Renove Method 和 Move Method 将类的职责描述清楚，并将相关的代码移动到一个类中，完成两个类的合并。
-2. 如果两个类存并非普通的工具类而是存在一定的继承关系，可以采用 Extract SuperClass （提炼超类）。
-
-当遇到代码中的坏味道的时候，请避免延迟决策和延迟解决，因为它很可能后续导致其他的坏味道。及时个人意识到可以延迟决策但是放在团队中会可能在这个地方重复遇到问题，导致后续坏味道不断被扩散。一次一旦遇到类似的坏味道可以遵守“童子军军规”：让营地比你来的时候更干净！
-
-## 10 纯数据类
-
-纯数据类指的是：一个类中只有属性和这些属性所涉及到的 getter、setter。
-
-**为什么纯数据类是一种代码坏味道？**
-
-纯数据类有其使用场景，比如 DTO 经常这种贫血模型。但是如果结合业务到的纯数据类频繁出现，那可不是什么好的事情，因为操作这个类中属性的方法将会散落在各个类中，即存在者多处强耦合。
-
-**如何解决纯数据类这种代码坏味道？**
-
-建议使用充血模型，一个类中除了拥有属性也应该包含具有一定业务逻辑的行为。那么可以选择
-
-1. Extract Method 将部分调用逻辑进行提炼，提炼成一定的方法；
-2. 再使用 Move Method 将方法移动到类中，
-3. 最后 Hide Method 删除纯出局类中的 getter 和 setter。
-
-纯数据类有其使用场景，但是应该时刻注意到哪些场景下数据类会引入坏味道，一旦发现尽早解决。
-
-作者：PageThinker
-链接：https://zhuanlan.zhihu.com/p/141993156
-来源：知乎
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
 
 
 
-这四个代码坏味道是：
 
-1. 中间人（Middle Man）
-2. 狎昵关系
-3. 不完美的库类
-4. 被拒绝的遗赠
+## 3. 代码的坏味道之c++
+
+
 
 ### 01 中间人（Middle Man）
-
-在上一篇文章中 [《识别代码中的坏味道（二）》](https://zhuanlan.zhihu.com/p/141803738)中在“过度耦合的消息链”这种代码坏味道曾经提及过中间人（Middle Man）这种代码坏味道，那么中间人到底是一类什么代码呢？
 
 中间人指的是一种过度使用委托的代码，《重构》中给了一个参考值，如果一个类中有一半的方法都委托给其他对象进行，
 
@@ -994,51 +573,121 @@ private Date nextDay(Date previousEnd) {
 1. 改善继承体系。剔除子类不需要的方法，并创建子类的兄弟，通过 Move Method 将不需要的方法移动到兄弟类中，通过 Move Field 将涉及到非公共属性也移动到兄弟子类中。
 2. 使用代理来取代继承。这种方式的修改只涉及到对子类的调整，影响范围较小，并且也不会因此而像第一种重构方法那样因为要维护继承体系而导致一些新概念的产生。同时还能避免因为基类继承了某个接口，而导致的子类被迫实现某些方法的情况。
 
-### 总结
+### 05 冗赘类（Lacy Class）
 
-至此 22 种常见的代码坏味道已经介绍完成。关注工具、框架的同时花一部分精力关注代码质量，能够让项目随着时间不断演进。当然实际工作中遇到的坏味道往往比这 22 种还要多。
+这是单一职责的一个极端表现，即拆分了很多类，每个类的职责过度单一。
 
-项目中我们可以使用 [Check Style](https://zhuanlan.zhihu.com/p/105583516)、[PMD](https://zhuanlan.zhihu.com/p/105585075)、[Arch Unit](https://zhuanlan.zhihu.com/p/107151861)帮助我们及时发现项目中的问题，但是更”软“的部分需要我们花精力来理解清楚是什么、为什么、怎么解决。
+**为什么冗赘类是一种代码坏味道？**
 
-或许你也已经发现了，很多情况下坏味道的原因在于变化时，无法快速应对变化，有的是代码设计的问题，有的是可读性的问题。即使代码坏味道也分为强烈的坏味道和淡淡的坏味道，所以重构的原则也是”事不过三、三则重构“，因此面对代码坏味道的时候如果代码坏味道很淡我们可以延迟消除坏味道。如果坏味道已经很强烈，或者淡淡的坏味道因为频繁的变化而导致效率下降时，那就不如先解决这种坏味道。
+因为每个类都是有阅读成本低的，职责拆分的过细，意味着多个关联性强的职责也被拆分了，因此阅读代码来成本不一定提升，反而因为过分的分散而导致理解起来需要会非常费劲。
 
+**如何解决冗赘类这种代码坏味道？**
 
+这个坏味道也给开发者一个提醒，极端的追求某些原则同样会导致不必要的麻烦，因此需要通过不断的练习和思考来获取平衡的这种点。
 
+代码中一旦遇到职责过度拆分的情况就可以通过 Inline Class 或者 Collapse Hierarchy 来删除一些类，将概念合并到一个类中。
 
-
-
-
-
-
-
+当代码更多的是处理业务逻辑的时候，那么其中的类应该像领域语言靠近，尽量避免凭空制造一些概念，拆分职责的时候和业务相结合更有利于我们将代码写的简单易读。
 
 
 
+### 06 异曲同工的类
+
+即两个类做的同一件事或者同一类事。这种代码很常见，比如两个开发者同时执行自己的开发工作，创建了功能类似但是方法不同的类，Code Review 的时候很容易发现这种代码。
+
+**为什么异曲同工的类是一种代码坏味道？**
+
+按照上面的描述，如果保留两个职责类似的类会有什么不好？
+
+1. 后续调用实现类时会导致选择上的疑虑，两个类应该选择用哪个，而疑虑之下就是时间的浪费。
+2. 添加代码的时候，只向其中一个类中添加了逻辑，后续调用时 就会困扰调用者，而且容易导致两个类中容易出现重复的代码。
+
+异曲同工的类是后续很多坏味道的开始。
+
+**如何解决异曲同工的类这种代码坏味道？**
+
+1. 一般情况，如果两个类是一般的工具类，可以选择使用Renove Method 和 Move Method 将类的职责描述清楚，并将相关的代码移动到一个类中，完成两个类的合并。
+2. 如果两个类存并非普通的工具类而是存在一定的继承关系，可以采用 Extract SuperClass （提炼超类）。
+
+当遇到代码中的坏味道的时候，请避免延迟决策和延迟解决，因为它很可能后续导致其他的坏味道。及时个人意识到可以延迟决策但是放在团队中会可能在这个地方重复遇到问题，导致后续坏味道不断被扩散。一次一旦遇到类似的坏味道可以遵守“童子军军规”：让营地比你来的时候更干净！
+
+### 07 纯数据类
+
+纯数据类指的是：一个类中只有属性和这些属性所涉及到的 getter、setter。
+
+**为什么纯数据类是一种代码坏味道？**
+
+纯数据类有其使用场景，比如 DTO 经常这种贫血模型。但是如果结合业务到的纯数据类频繁出现，那可不是什么好的事情，因为操作这个类中属性的方法将会散落在各个类中，即存在者多处强耦合。
+
+**如何解决纯数据类这种代码坏味道？**
+
+建议使用充血模型，一个类中除了拥有属性也应该包含具有一定业务逻辑的行为。那么可以选择
+
+1. Extract Method 将部分调用逻辑进行提炼，提炼成一定的方法；
+2. 再使用 Move Method 将方法移动到类中，
+3. 最后 Hide Method 删除纯出局类中的 getter 和 setter。
+
+纯数据类有其使用场景，但是应该时刻注意到哪些场景下数据类会引入坏味道，一旦发现尽早解决。
+
+### 08 过大的类
+
+顾名思义就是一个类做了太多的事情。SOLID 原则告诉我们类的职责应该是单一的，而一个过大类很可能意味着承担了多个/多类职责。
+
+**过大的类为什么是一种坏味道？**
+
+由于过大的类承担了过多的职责，很容易导致 重复代码 且 重复代码 不容易被发现，而这往往是坏味道的开始。
+
+如果过大的类对外提供服务发生了变动，并不容易快速响应这样的变化，可以对比一下一个小而职责单一的类中进行修改方便还是在多很多职责。
+
+当过大的类因为某个地方发生变化，很可能导致不相关的调用方的代码也会发生变化，这是一种耦合性的表现。
+
+当过大的类被继承时很可能导致其他的坏味道，例如遗留的馈赠。
+
+因此，保持小而职责单一的类将会对系统的设计有很大的帮助。当然也可以参考 Simple Design，避免过度设计的前提下保持简单的设计。
 
 
-1、多此一举型代码。
 
+**如何解决过大的类的代码坏味道？**
+
+1. 观察这个过大的类的属性，看是否有关联的几个属性能够代表一定的业务意思，如果可以使用 Extract Class，将这几个属性挪动到一个新的类中，并将相关操作挪动到新的类中。循环往复，这样一个大的类能够拆分成多个小的且职责较为单一的类。
+2. 观察这个大类中的方法，看是否存在兄弟关系的方法，如果有可以使用 Extract Subclass （提炼子类）的方法，将相关方法提炼到子类中，并考虑使用继承父类还是面向接口使用 Extract Interface（提炼接口）。这样相似行为的行为聚集在一个类中，拆分到多个类中，并可以进一步和方法的调用发来解耦。
+3. 进一步观察剩余类的行为，如果这些行为在处理一类事情，那么可以停止了，在处理多类事情，可以按照处理逻辑的类型进一步拆分。
+
+简而言之，使用一个亘古不变的法则：分治法。将过大的类，拆分成多个职责单一的小类，手段是 Extract Class，Extract Subclass，Extract Interface。
+
+
+
+# 三. 其他：
+
+
+
+```
 if(a > b){
    return true;
 }else{
    return false;
 }
-也许一些经验不那么老道的开发会觉得这段代码没问题呀，可以跑得通，确实，在逻辑上是没问题的，但是有更简洁明了的写法为何不用？if() 里面的条件是boolean ，然后我们的返回值也是boolean，所以可以改写成
+```
 
-return a > b;
+
 
 
 2、瞎命名型代码。
 
+```
 int a;
 String wzbt; // 文章标题
 String fastdi; //fast di 快递  。。中西结合...
+```
+
+
 以上只是不规范命名的实例的冰山一角，良好的命名除了见名知意以外，还可以在长时间以后回来阅读代码时，更快的回忆起业务逻辑，不至于在各种无解的命名中乱了手脚，为了一时的方便而随意命名是非常不值得的。
 
  
 
 3、if完一定要加else型代码
 
+```
 if(condition){
    //dosm
 }else{
@@ -1058,8 +707,12 @@ while(xx){
             continue;    
     }
 }
-很多情况下，我们通过一些语句的前置类减少不必要的else，让代码看起来更简练清晰。
+```
 
+
+
+
+```
 if(!condition){
    return ;
 }
@@ -1068,34 +721,12 @@ if(!condition){
 if(!condition){
    throw new Exception();
 }
-//dosm
+```
 
 
-   4、复制粘贴型
 
-举个例子，项目中A模块引入B模块的优惠券业务，此时C模块也要引入B模块的优惠券业务，由于此时的优惠券业务可能是B模块中的几行代码，很多人就为了贪图方便，直接复制这几行代码直接放到C模块了。so easy，代码完美运行。
 
-看起来似乎又没什么毛病，此时程序员的天敌产品经理过来了，他说在要在优惠券逻辑前面加点限制条件，ok，那么此时就要改动A模块跟B模块2份代码，而且要保持一致性，这个需求就完成了。过了一个版本，D模块也要引用优惠券业务，此时你又愉快的复制过去，然后可爱的产品经理又过来跟你说，这个版本我们要砍掉前面的限制条件...这时候你就要同步三段代码...跟产品经理的一场大战估计在所难免了。 
 
-所以从上面的案例中，如果我们一开始不偷懒把公共逻辑抽取出来，在各个模块引用的话，不论怎么修改，我们只要维护一份逻辑就可以，不至于手忙脚乱。
 
- 
 
-5、又长又臭型代码
-
-此类坏味道代码一般出现在“有历史“的代码中，经过不同开发人员的迭代，一个方法可能会出现几千行的情况，即使有注释，也会让人看得痛不欲生，这时候刚接手修改的人必然会说一句“WTF”了。
-
-所以这就要求我们在平时写代码的过程中养成提炼的习惯，一般来说，当某块业务逻辑需要注释来说明的时候，一般都可以提炼成方法来调用，通过这种方式会使得阅读代码的时候逻辑更加清晰。
-
-还有一种又长又臭情况是出现在方法的参数中，不断的迭代过程也会导致参数的增加或者修改，甚至有看过朋友公司的代码出现一个方法10多个参数的情况。一般来说，当参数超过5个的时候就要考虑封装到对象当中了。
-
- 
-
-6、无病呻吟型
-
-//输出info日志
-logger.info("xxx");
-
-//定义num变量
-int num  = 0;
-
+文章部分转载：链接：https://zhuanlan.zhihu.com/p/141993156

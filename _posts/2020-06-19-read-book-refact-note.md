@@ -131,12 +131,14 @@ public static int getServiceCode(String str){
  }
 ```
 
+```
 `public static void initialMap(){
    map.put("Age",1);`
      `map.put("Address",2);`
      `map.put("Name",3);`
      `map.put("No",4);`
  }
+```
 
 这种实现方法很多代码中都会出现，但是多数人使用这种方式添加代码，并不意味着这是一种好的代码。这样的实现方式很容易造成长函数，而且每次修改的位置要非常精准，需要在多个条件中逐个遍历找到最终需要的那个，再修改，可读性上无疑也是很差的。
 

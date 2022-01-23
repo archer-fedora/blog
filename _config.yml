@@ -7,17 +7,17 @@ github_username:  archer-fedora
 googleplus_username: archer-fedora
 
 head-title: Bobliu's blog
-title: 上善若水
+title: liubo's blog
 
 baseurl: /blog    # the subpath of your site, "/blog"
 url: ""
 
 
 # footer 
-description: "Do what you want, Study what you need, \nLove the person who you love. Only Keep On"
+# description: "Do what you want, Study what you need, \nLove the person who you love. Only Keep On"
 
-favo: "反者道之动。弱者道之用。天下万物生於有，有生於无"
-descrpt: "循环往复的运动变化，是道的运动，道的作用是微妙、柔弱的。天下的万物产生于看得见的有形质，有形质又产生于不可见的无形质。\n "
+# favo: "反者道之动。弱者道之用。天下万物生於有，有生於无"
+# descrpt: "循环往复的运动变化，是道的运动，道的作用是微妙、柔弱的。天下的万物产生于看得见的有形质，有形质又产生于不可见的无形质。\n "
 
 
 #
